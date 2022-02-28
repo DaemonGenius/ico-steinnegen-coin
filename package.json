@@ -1,0 +1,17 @@
+{
+  "name": "ico-steinnegen-coin",
+  "version": "0.0.1",
+  "description": "ICO Coin",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Christian Steinmann",
+  "license": "ISC",
+  "dependencies": {
+    "openzeppelin-solidity": "^4.5.0"
+  }
+}
