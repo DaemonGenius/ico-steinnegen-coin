@@ -21,7 +21,7 @@ contract("Coin", async function (accounts) {
     let totalSupply = await coinInstance.totalSupply();
     assert.equal(
       totalSupply.toNumber(),
-      100000000,
+      100000000000000000000000000,
       "sets the total supply to 1 000 000 000 000"
     );
   });
@@ -30,7 +30,7 @@ contract("Coin", async function (accounts) {
     let BalanceOf = await coinInstance.balanceOf(accounts[0]);
     assert.equal(
       BalanceOf.toNumber(),
-      100000000,
+      100000000000000000000000000,
       "allocates the initial supply to the admin account"
     );
   });
@@ -40,7 +40,7 @@ contract("Coin", async function (accounts) {
     let transferAmount = 250000;
 
     try {
-      await coinInstance.transfer.call(accounts[1], 9999999999999999999999999);
+      await coinInstance.transfer.call(accounts[1], 10000000000000000000000000000000000);
     } catch (error) {
       assert(
         error.message.indexOf("overflow") >= 0,
