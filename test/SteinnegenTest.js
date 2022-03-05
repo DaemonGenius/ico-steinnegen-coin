@@ -3,14 +3,17 @@ const ganache = require('ganache-cli')
 const Web3 = require('web3')
 const web3 = new Web3(ganache.provider())
 
-const totalSupplyAmount = web3.utils.toWei('100000000', "ether");
+const totalSupplyAmount = web3.utils.toWei('0.001', "ether");
+let creator;
 
 contract("Coin", async function (accounts) {
   let CoinInstance;
   // before tells our tests to run this first before anything else
   before(async () => {
     coinInstance = await Coin.deployed();
+    creator = accounts[0];
   });
+  console.log(totalSupplyAmount);
 
   it("Initializes the contract with the correct Symbol", async () => {
     let symbol = await coinInstance.symbol();
@@ -32,7 +35,7 @@ contract("Coin", async function (accounts) {
   });
 
   it("BalanceOf", async () => {
-    let BalanceOf = await coinInstance.balanceOf(accounts[0]);
+    let BalanceOf = await coinInstance.balanceOf(creator);
     assert.equal(
       BalanceOf.toNumber(),
       totalSupplyAmount,
@@ -42,7 +45,7 @@ contract("Coin", async function (accounts) {
 
   it("Transfers Token Ownership", async () => {
     let transferInstance = "";
-    let transferAmount = 250000;
+    let transferAmount = web3.utils.toWei('1000', "ether");
 
     try {
       await coinInstance.transfer.call(accounts[1], totalSupplyAmount);
@@ -54,12 +57,12 @@ contract("Coin", async function (accounts) {
     }
 
     assert.equal(
-      await coinInstance.transfer.call(accounts[0], transferAmount),
+      await coinInstance.transfer.call(creator, transferAmount),
       true,
       "Transfer Successful"
     );
 
-    let BalanceOfSenderPrior = await coinInstance.balanceOf(accounts[0]);
+    let BalanceOfSenderPrior = await coinInstance.balanceOf(creator);
     console.log("Account 0: " + BalanceOfSenderPrior.toNumber());
 
     let BalanceOfAccountPrior = await coinInstance.balanceOf(accounts[1]);
@@ -67,7 +70,7 @@ contract("Coin", async function (accounts) {
     let receipt = "";
     try {
       receipt = await coinInstance.transfer(accounts[1], transferAmount, {
-        from: accounts[0],
+        from: creator,
       });
 
     } catch (error) {
@@ -83,7 +86,7 @@ contract("Coin", async function (accounts) {
     );
     console.log("Account 1: " + BalanceOf.toNumber());
 
-    BalanceOf = await coinInstance.balanceOf(accounts[0]);
+    BalanceOf = await coinInstance.balanceOf(creator);
 
     assert.equal(
       BalanceOf.toNumber(),
@@ -118,7 +121,7 @@ contract("Coin", async function (accounts) {
 
     console.log(receipt);
 
-    let allowance = await coinInstance.allowance(accounts[0], accounts[1]);
+    let allowance = await coinInstance.allowance(creator, accounts[1]);
 
     assert.equal(
       allowance,
@@ -133,7 +136,7 @@ contract("Coin", async function (accounts) {
     let spendingAccount = accounts[4];
     let transferAmount = 10;
     await coinInstance.transfer(fromAccount, 100, {
-      from: accounts[0],
+      from: creator,
     });
 
     await coinInstance.approve(spendingAccount, transferAmount, {

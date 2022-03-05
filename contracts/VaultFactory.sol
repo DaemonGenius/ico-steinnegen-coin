@@ -14,13 +14,13 @@ contract VaultFactory {
         return wallets[_user];
     }
 
-    function newVault(address _owner, uint256 _unlockDate)
+    function newVault(address _owner, uint256 _unlockDate, uint256 _startDate)
         payable
         public
         returns(address wallet)
     {
         // Create new wallet.
-        wallet = address(new Vault(msg.sender, _owner, _unlockDate));
+        wallet = address(new Vault(msg.sender, _owner, _unlockDate, _startDate));
         
         // Add wallet to sender's wallets.
         wallets[msg.sender].push(wallet);

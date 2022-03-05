@@ -7,6 +7,7 @@ contract Vault {
     address public owner;
     uint256 public unlockDate;
     uint256 public createdAt;
+    uint256 public startedAt;
 
     
     event Received(address from, uint256 amount);
@@ -21,17 +22,19 @@ contract Vault {
     constructor(
         address _creator,
         address _owner,
-        uint256 _unlockDate
+        uint256 _unlockDate,
+        uint256 _startedAt
     ) {
         creator = _creator;
         owner = _owner;
         unlockDate = _unlockDate;
         createdAt = block.timestamp;
+        startedAt = _startedAt;
     }
 
      // callable by owner only, after specified time
     function withdraw() onlyOwner public payable {
-       require(block.timestamp >= unlockDate);
+       require(startedAt >= unlockDate);
        //now send all the balance
        payable(msg.sender).transfer(address(this).balance);
        emit Withdrew(msg.sender, address(this).balance);
@@ -39,7 +42,7 @@ contract Vault {
 
     // callable by owner only, after specified time, only for Tokens implementing ERC20
     function withdrawTokens(address _tokenContract) onlyOwner public {
-       require(block.timestamp >= unlockDate);
+       require(startedAt >= unlockDate);
        ERC20 token = ERC20(_tokenContract);
        //now send all the token balance
        uint256 tokenBalance = token.balanceOf(address(this));

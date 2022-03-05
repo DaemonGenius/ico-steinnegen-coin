@@ -22,9 +22,11 @@ contract('VaultFactory', (accounts) => {
 
     it("Factory created contract is working well", async () => {
         // Create the wallet contract.
-        let now = Math.floor((new Date).getTime() / 1000);
+        // let now = Math.floor((new Date).getTime() / 1000);
+        let now = '1646519809';
+        let end = '1649182035';
         await vaultFactory.newVault(
-            owner, now, {from: creator, value: ethToSend}
+            owner, end, now, {from: creator, value: ethToSend}
         );
 
         // Check if wallet can be found in creator's wallets.
