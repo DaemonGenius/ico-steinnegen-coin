@@ -1,4 +1,9 @@
 var Coin = artifacts.require("./Steinnegen.sol");
+const ganache = require('ganache-cli')
+const Web3 = require('web3')
+const web3 = new Web3(ganache.provider())
+
+const totalSupplyAmount = web3.utils.toWei('100000000', "ether");
 
 contract("Coin", async function (accounts) {
   let CoinInstance;
@@ -21,7 +26,7 @@ contract("Coin", async function (accounts) {
     let totalSupply = await coinInstance.totalSupply();
     assert.equal(
       totalSupply.toNumber(),
-      100000000000000000000000000,
+      totalSupplyAmount,
       "sets the total supply to 1 000 000 000 000"
     );
   });
@@ -30,7 +35,7 @@ contract("Coin", async function (accounts) {
     let BalanceOf = await coinInstance.balanceOf(accounts[0]);
     assert.equal(
       BalanceOf.toNumber(),
-      100000000000000000000000000,
+      totalSupplyAmount,
       "allocates the initial supply to the admin account"
     );
   });
@@ -40,7 +45,7 @@ contract("Coin", async function (accounts) {
     let transferAmount = 250000;
 
     try {
-      await coinInstance.transfer.call(accounts[1], 10000000000000000000000000000000000);
+      await coinInstance.transfer.call(accounts[1], totalSupplyAmount);
     } catch (error) {
       assert(
         error.message.indexOf("overflow") >= 0,

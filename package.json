@@ -12,6 +12,10 @@
   "author": "Christian Steinmann",
   "license": "ISC",
   "dependencies": {
-    "openzeppelin-solidity": "^4.5.0"
+    "openzeppelin-solidity": "^4.5.0",
+    "ganache-cli": "^6.12.2",
+    "solc": "^0.4.17",
+    "truffle": "^5.5.2",
+    "web3": "^1.7.0"
   }
 }
