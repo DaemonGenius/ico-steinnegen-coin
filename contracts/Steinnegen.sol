@@ -14,7 +14,7 @@ contract Steinnegen is ERC20 {
     }
 
     Checkpoint[] totalSupplyHistory;
-    
+
     mapping(address => Checkpoint[]) balances;
     mapping(address => mapping(address => uint256)) allowed;
 
@@ -25,6 +25,8 @@ contract Steinnegen is ERC20 {
         require(!mintingFinished);
         _;
     }
+
+    event MintFinished();
 
     constructor() ERC20("Steinnegen", "STEIN") {}
 
@@ -64,5 +66,15 @@ contract Steinnegen is ERC20 {
      */
     function enableMasterTransfers(bool _value) public {
         masterTransfersEnabled = _value;
+    }
+
+    /**
+     * Lock the minting of Proof Tokens - to be called after the presale
+     * @return {bool} success
+     */
+    function finishMinting() public returns (bool) {
+        mintingFinished = true;
+        emit  MintFinished();
+        return true;
     }
 }
