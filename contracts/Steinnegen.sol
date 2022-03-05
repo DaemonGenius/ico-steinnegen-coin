@@ -7,13 +7,4 @@ contract Steinnegen is ERC20 {
         _mint(msg.sender, 100000000000000000000000000);
     }
 
-    uint256 public totalWeiRaised;
-    uint256 public tokensMinted;
-    uint256 public totalSupply;
-    uint256 public contributors;
-    uint256 public decimalsMultiplier;
-    uint256 public startTime;
-    uint256 public endTime;
-    uint256 public remainingTokens;
-    uint256 public allocatedTokens;
 }
