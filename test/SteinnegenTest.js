@@ -1,9 +1,9 @@
 var Coin = artifacts.require("./Steinnegen.sol");
-const ganache = require('ganache-cli')
-const Web3 = require('web3')
-const web3 = new Web3(ganache.provider())
+const ganache = require("ganache-cli");
+const Web3 = require("web3");
+const web3 = new Web3(ganache.provider());
 
-const totalSupplyAmount = web3.utils.toWei('0.001', "ether");
+const totalSupplyAmount = web3.utils.toWei("0.002", "ether");
 let creator;
 
 contract("Coin", async function (accounts) {
@@ -45,67 +45,95 @@ contract("Coin", async function (accounts) {
 
   it("Transfers Token Ownership", async () => {
     let transferInstance = "";
-    let transferAmount = web3.utils.toWei('1000', "ether");
-
+    let transferAmount = 250000;
+    let balance;
     try {
-      await coinInstance.transfer.call(accounts[1], totalSupplyAmount);
+      await coinInstance.transfer.call(accounts[1], 99999999999999999999999);
     } catch (error) {
       assert(
         error.message.indexOf("overflow") >= 0,
         "error message must contain revert"
       );
+
+      assert.equal(
+        await coinInstance.transfer.call(creator, transferAmount),
+        true,
+        "Transfer Successful"
+      );
     }
-
-    assert.equal(
-      await coinInstance.transfer.call(creator, transferAmount),
-      true,
-      "Transfer Successful"
-    );
-
-    let BalanceOfSenderPrior = await coinInstance.balanceOf(creator);
-    console.log("Account 0: " + BalanceOfSenderPrior.toNumber());
-
-    let BalanceOfAccountPrior = await coinInstance.balanceOf(accounts[1]);
-    console.log("Account 1: " + BalanceOfAccountPrior.toNumber());
-    let receipt = "";
     try {
       receipt = await coinInstance.transfer(accounts[1], transferAmount, {
         from: creator,
       });
-
+      assert.equal(receipt.logs.length, 1, "triggers one event");
+      assert.equal(
+        receipt.logs[0].event,
+        "Transfer",
+        'should be the "Transfer" event'
+      );
+      assert.equal(
+        receipt.logs[0].args.from,
+        accounts[0],
+        "logs the account the tokens are transferred from"
+      );
+      assert.equal(
+        receipt.logs[0].args.to,
+        accounts[1],
+        "logs the account the tokens are transferred to"
+      );
+      assert.equal(
+        receipt.logs[0].args.value,
+        250000,
+        "logs the transfer amount"
+      );
     } catch (error) {
       assert(error, "Transfer failure");
     }
 
-    let BalanceOf = await coinInstance.balanceOf(accounts[1]);
+    balance = await coinInstance.balanceOf(accounts[0]);
 
     assert.equal(
-      BalanceOf.toNumber(),
-      BalanceOfAccountPrior.toNumber() + transferAmount,
+      balance.toNumber(),
+      1999999999750000,
+      "deducts the amount from the sending account"
+    );
+    balance = await coinInstance.balanceOf(accounts[1]);
+    assert.equal(
+      balance.toNumber(),
+      250000,
       "adds the amount to the receiving account"
     );
-    console.log("Account 1: " + BalanceOf.toNumber());
-
-    BalanceOf = await coinInstance.balanceOf(creator);
-
-    assert.equal(
-      BalanceOf.toNumber(),
-      BalanceOfSenderPrior.toNumber() - transferAmount,
-      "deducts the amount to the sending account"
-    );
-
-    console.log("Account 0: " + BalanceOf.toNumber());
-
-    assert.equal(receipt.logs.length, 1, "triggers one event");
-    assert.equal(
-      receipt.logs[0].args.value,
-      transferAmount,
-      "Logs transfer amount"
-    );
-
-    console.log("Receipt Logs: " + JSON.stringify(receipt.logs[0]));
-    console.log("Receipt Logs Transfer Amount: " + receipt.logs[0].args.value);
   });
+
+  // it('transfers token ownership', function() {
+  //   return Coin.deployed().then(function(instance) {
+  //     tokenInstance = instance;
+  //     // Test `require` statement first by transferring something larger than the sender's balance
+  //     return tokenInstance.transfer.call(accounts[1], 99999999999999999999999);
+  //   }).then(assert.fail).catch(function(error) {
+  //     console.log(error);
+  //     assert(error.message.indexOf('overflow') >= 0, 'error message must contain revert');
+  //     // This will only call the function, and not write to disk
+  //     // We want to inspect the function return value rather than the transaction receipt
+  //     return tokenInstance.transfer.call(accounts[1], 250000);
+  //   }).then(function(success) {
+  //     assert.equal(success, true, 'it returns true')
+  //     // Actually transfer by calling the function & writing to disk
+  //     return tokenInstance.transfer(accounts[1], 250000);
+  //   }).then(function(receipt) {
+  //     assert.equal(receipt.logs.length, 1, 'triggers one event');
+  //     assert.equal(receipt.logs[0].event, 'Transfer', 'should be the "Transfer" event');
+  //     assert.equal(receipt.logs[0].args.from, accounts[0], 'logs the account the tokens are transferred from');
+  //     assert.equal(receipt.logs[0].args.to, accounts[1], 'logs the account the tokens are transferred to');
+  //     assert.equal(receipt.logs[0].args.value, 250000, 'logs the transfer amount');
+  //     return tokenInstance.balanceOf(accounts[0]);
+  //   }).then(function(balance) {
+  //     assert.equal(balance.toNumber(), 1999999999750000, 'deducts the amount from the sending account');
+  //     return tokenInstance.balanceOf(accounts[1]);
+  //   }).then(function(balance) {
+  //     assert.equal(balance.toNumber(), 250000, 'adds the amount to the receiving account');
+  //   })
+  // });
 
   it("approves tokens for delegated transfer", async () => {
     let approve = await coinInstance.approve.call(accounts[1], 100);
@@ -181,9 +209,14 @@ contract("Coin", async function (accounts) {
     }
 
     try {
-      let receipt = await coinInstance.transferFrom(fromAccount, toAccount, 10, {
-        from: spendingAccount,
-      });
+      let receipt = await coinInstance.transferFrom(
+        fromAccount,
+        toAccount,
+        10,
+        {
+          from: spendingAccount,
+        }
+      );
       assert.equal(receipt.logs.length, 2, "triggers one event");
       assert.equal(
         receipt.logs[1].event,
@@ -232,6 +265,10 @@ contract("Coin", async function (accounts) {
 
     allowance = await coinInstance.allowance(fromAccount, spendingAccount);
 
-    assert.equal(allowance.toNumber(), 0, "deducts the amount form the allowance");
+    assert.equal(
+      allowance.toNumber(),
+      0,
+      "deducts the amount form the allowance"
+    );
   });
 });
