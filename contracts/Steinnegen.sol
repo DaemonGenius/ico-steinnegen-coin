@@ -7,7 +7,7 @@ import "./Vault.sol";
 contract Steinnegen is ERC20 {
 
     constructor() ERC20("Steinnegen", "STEIN") {
-        _mint(msg.sender, 2000000000000000);
+        _mint(msg.sender, 100000000000000000000000000);
     }
 
 
