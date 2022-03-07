@@ -97,16 +97,17 @@ contract("Vault", (accounts) => {
   it("Owner can withdraw the coinInstance after the unlock date", async () => {
     //set unlock date in unix epoch to now
     let now = Math.floor(new Date().getTime() / 1000);
+
     //create the wallet contract
     let vault = await Vault.new(creator, owner, now);
 
     //create coinInstance contract
     let coinInstance = await Coin.new({ from: creator });
     //check contract initiated well and has 1M of tokens
-    assert(1000000000000 == (await coinInstance.balanceOf(creator)));
+    assert(ethToSend == (await coinInstance.balanceOf(creator)));
 
     //load the wallet with some Toptal tokens
-    let amountOfTokens = 1000000000;
+    let amountOfTokens = ethToSend;
     await coinInstance.transfer(vault.address, amountOfTokens, {
       from: creator,
     });
@@ -114,6 +115,7 @@ contract("Vault", (accounts) => {
     assert(amountOfTokens == (await coinInstance.balanceOf(vault.address)));
     //now withdraw tokens
     await vault.withdrawTokens(coinInstance.address, { from: owner });
+
     //check the balance is correct
     let balance = await coinInstance.balanceOf(owner);
     assert(balance.toNumber() == amountOfTokens);
