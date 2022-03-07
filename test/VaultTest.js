@@ -2,9 +2,6 @@ var VaultFactory = artifacts.require("./VaultFactory.sol");
 var Vault = artifacts.require("./Vault.sol");
 var Coin = artifacts.require("./Steinnegen.sol");
 const assert = require("assert");
-const ganache = require("ganache-cli");
-const Web3 = require("web3");
-const web3 = new Web3(ganache.provider());
 
 let ethToSend = web3.utils.toWei("0.002", "ether");
 let someGas = web3.utils.toWei("0.001", "ether");
@@ -13,8 +10,6 @@ let creator;
 let owner;
 
 contract("Vault", (accounts) => {
-  let now = '1641042061';
-  let end = '1643720461';
   // before tells our tests to run this first before anything else
   before(async () => {
     creator = accounts[0];
@@ -24,38 +19,24 @@ contract("Vault", (accounts) => {
 
   it("Owner can withdraw the funds after the unlock date", async () => {
     //set unlock date in unix epoch to now
-    // let now = Math.floor(new Date().getTime() / 1000);
-
+    let now = Math.floor(new Date().getTime() / 1000);
     //create the contract and load the contract with some eth
-    let vault = await Vault.new(creator, owner, end, now);
-    let info = await vault.info();
+    let vault = await Vault.new(creator, owner, now);
+    await vault.send(ethToSend, { from: creator });
 
-
-    console.log('Creator: '+info[0]);
-    console.log('Owner: '+info[1]);
-    console.log('End Date: '+new Date(info[2].toNumber()*1000));
-    console.log('Start Date: '+new Date(info[3].toNumber()*1000));
-    console.log('Balance: '+info[4].toNumber());
     console.log(await web3.eth.getBalance(vault.address));
+    assert(ethToSend == (await web3.eth.getBalance(vault.address)));
+    let balanceBefore = await web3.eth.getBalance(owner);
+    console.log("Balance Before: " + balanceBefore);
 
     try {
-    //   await vault.send(ethToSend, { from: creator });
-      await vault.send(ethToSend, {
-        from: accounts[0],
-        gas: "1000000",
-      });
-      assert(ethToSend == (await web3.eth.getBalance(vault.address)));
-      let balanceBefore = await web3.eth.getBalance(owner);
-      console.log("Balance Before: " + balanceBefore);
       await vault.withdraw({ from: owner });
-      let balanceAfter = await web3.eth.getBalance(owner);
-      console.log("Balance After: " + balanceAfter);
-      assert(balanceAfter - balanceBefore >= ethToSend - someGas);
     } catch (e) {
-      console.log(e.message);
+      console.log(e);
     }
-
-   
+    let balanceAfter = await web3.eth.getBalance(owner);
+    console.log("Balance After: " + balanceAfter);
+    assert(balanceAfter - balanceBefore >= ethToSend - someGas);
   });
 
   it("Nobody can withdraw the funds before the unlock date", async () => {
@@ -63,7 +44,7 @@ contract("Vault", (accounts) => {
     let futureTime = Math.floor(new Date().getTime() / 1000) + 50000;
 
     //create the contract
-    let vault = await Vault.new(creator, owner, futureTime, now);
+    let vault = await Vault.new(creator, owner, futureTime);
 
     //load the contract with some eth
     await vault.send(ethToSend, { from: creator });
@@ -92,7 +73,7 @@ contract("Vault", (accounts) => {
     let now = Math.floor(new Date().getTime() / 1000);
 
     //create the contract
-    let vault = await Vault.new(creator, owner, end, now);
+    let vault = await Vault.new(creator, owner, now);
 
     //load the contract with some eth
     await vault.send(ethToSend, { from: creator });
@@ -117,7 +98,7 @@ contract("Vault", (accounts) => {
     //set unlock date in unix epoch to now
     let now = Math.floor(new Date().getTime() / 1000);
     //create the wallet contract
-    let vault = await Vault.new(creator, owner, end, now);
+    let vault = await Vault.new(creator, owner, now);
 
     //create coinInstance contract
     let coinInstance = await Coin.new({ from: creator });

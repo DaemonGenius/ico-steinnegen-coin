@@ -22,19 +22,17 @@ contract Vault {
     constructor(
         address _creator,
         address _owner,
-        uint256 _unlockDate,
-        uint256 _startedAt
+        uint256 _unlockDate
     ) {
         creator = _creator;
         owner = _owner;
         unlockDate = _unlockDate;
         createdAt = block.timestamp;
-        startedAt = _startedAt;
     }
 
      // callable by owner only, after specified time
     function withdraw() onlyOwner public payable {
-       require(startedAt >= unlockDate);
+       require(block.timestamp >= unlockDate);
        //now send all the balance
        payable(msg.sender).transfer(address(this).balance);
        emit Withdrew(msg.sender, address(this).balance);
@@ -42,7 +40,7 @@ contract Vault {
 
     // callable by owner only, after specified time, only for Tokens implementing ERC20
     function withdrawTokens(address _tokenContract) onlyOwner public {
-       require(startedAt >= unlockDate);
+       require(block.timestamp >= unlockDate);
        ERC20 token = ERC20(_tokenContract);
        //now send all the token balance
        uint256 tokenBalance = token.balanceOf(address(this));
@@ -54,8 +52,13 @@ contract Vault {
         return (creator, owner, unlockDate, createdAt,  address(this).balance);
     }
 
-    receive() payable external { 
-      emit Received(msg.sender, msg.value);
+    receive() external payable {}
+
+    // Fallback function is called when msg.data is not empty
+    fallback() external payable {}
+
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
     }
 
 }
