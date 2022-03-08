@@ -104,10 +104,11 @@ contract("Vault", (accounts) => {
     //create coinInstance contract
     let coinInstance = await Coin.new(vault.address, { from: creator });
     //check contract initiated well and has 1M of tokens
-    assert('100000000' == (web3.utils.fromWei(await coinInstance.balanceOf(creator), 'ether')));
+    assert('1000000000000000' == (await coinInstance.balanceOf(creator)));
 
     //load the wallet with some Toptal tokens
-    let amountOfTokens = ethToSend;
+    let amountOfTokens = '1000000000000000';
+    console.log('amountOfTokens:' + amountOfTokens);
     await coinInstance.transfer(vault.address, amountOfTokens, {
       from: creator,
     });
@@ -118,6 +119,7 @@ contract("Vault", (accounts) => {
 
     //check the balance is correct
     let balance = await coinInstance.balanceOf(owner);
+
     assert(balance.toNumber() == amountOfTokens);
   });
 

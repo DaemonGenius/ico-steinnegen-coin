@@ -20,7 +20,7 @@ contract Steinnegen is ERC20 {
     );
 
     constructor(Vault _tokenContract) ERC20("Steinnegen", "STEIN") {
-        _mint(msg.sender, 100000000000000000000000000);
+        _mint(msg.sender, 1000000000000000);
         tokenContract = _tokenContract;
     }
 

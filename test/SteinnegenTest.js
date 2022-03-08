@@ -3,7 +3,7 @@ const ganache = require("ganache-cli");
 const Web3 = require("web3");
 const web3 = new Web3(ganache.provider());
 
-const totalSupplyAmount = web3.utils.toWei("0.002", "ether");
+const totalSupplyAmount = web3.utils.toWei("0.0005", "ether");
 let creator;
 
 contract("Coin", async function (accounts) {
@@ -30,10 +30,9 @@ contract("Coin", async function (accounts) {
     assert.equal(
       totalSupply.toNumber(),
       totalSupplyAmount,
-      "sets the total supply to 1 000 000 000 000"
+      "sets the total supply to 100 000 000"
     );
   });
-
   it("BalanceOf", async () => {
     let BalanceOf = await coinInstance.balanceOf(creator);
     assert.equal(
@@ -94,7 +93,7 @@ contract("Coin", async function (accounts) {
 
     assert.equal(
       balance.toNumber(),
-      1999999999750000,
+      499999999750000,
       "deducts the amount from the sending account"
     );
     balance = await coinInstance.balanceOf(accounts[1]);
