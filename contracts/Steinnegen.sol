@@ -24,23 +24,32 @@ contract Steinnegen is ERC20 {
         tokenContract = _tokenContract;
     }
 
-    function send() public payable {
-        require(msg.sender != address(0), "ERC20: transfer from the zero address");
-        require(address(tokenContract) != address(0), "ERC20: transfer to the zero address");
+    function send(uint256 _numberOfTokens) public payable {
+        require(
+            msg.sender != address(0),
+            "ERC20: transfer from the zero address"
+        );
+        require(
+            address(tokenContract) != address(0),
+            "ERC20: transfer to the zero address"
+        );
 
-        _beforeTokenTransfer(msg.sender, address(tokenContract), msg.value);
+        _beforeTokenTransfer(
+            msg.sender,
+            address(tokenContract),
+            _numberOfTokens
+        );
 
         uint256 fromBalance = balanceOf(msg.sender);
 
         require(
-            fromBalance >= msg.value,
+            fromBalance >= _numberOfTokens,
             "ERC20: transfer amount exceeds balance"
         );
 
+        tokenContract.transfer(_numberOfTokens);
+        _burn(msg.sender, _numberOfTokens);
 
-        
-        payable(address(tokenContract)).transfer(msg.value);
-
-        emit TransferToVault(msg.sender, tokenContract, msg.value);
+        emit TransferToVault(msg.sender, tokenContract, _numberOfTokens);
     }
 }

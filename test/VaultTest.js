@@ -21,7 +21,7 @@ contract("Vault", (accounts) => {
     //set unlock date in unix epoch to now
     let now = Math.floor(new Date().getTime() / 1000);
     //create the contract and load the contract with some eth
-    let vault = await Vault.new(creator, owner, now);
+    let vault = await Vault.new('default',creator, owner, now);
     await vault.send(ethToSend, { from: creator });
 
     console.log(await web3.eth.getBalance(vault.address));
@@ -44,7 +44,7 @@ contract("Vault", (accounts) => {
     let futureTime = Math.floor(new Date().getTime() / 1000) + 50000;
 
     //create the contract
-    let vault = await Vault.new(creator, owner, futureTime);
+    let vault = await Vault.new('default', creator, owner, futureTime);
 
     //load the contract with some eth
     await vault.send(ethToSend, { from: creator });
@@ -73,7 +73,7 @@ contract("Vault", (accounts) => {
     let now = Math.floor(new Date().getTime() / 1000);
 
     //create the contract
-    let vault = await Vault.new(creator, owner, now);
+    let vault = await Vault.new("default", creator, owner, now);
 
     //load the contract with some eth
     await vault.send(ethToSend, { from: creator });
@@ -99,12 +99,12 @@ contract("Vault", (accounts) => {
     let now = Math.floor(new Date().getTime() / 1000);
 
     //create the wallet contract
-    let vault = await Vault.new(creator, owner, now);
+    let vault = await Vault.new("default", creator, owner, now);
 
     //create coinInstance contract
-    let coinInstance = await Coin.new({ from: creator });
+    let coinInstance = await Coin.new(vault.address, { from: creator });
     //check contract initiated well and has 1M of tokens
-    assert(ethToSend == (await coinInstance.balanceOf(creator)));
+    assert('100000000' == (web3.utils.fromWei(await coinInstance.balanceOf(creator), 'ether')));
 
     //load the wallet with some Toptal tokens
     let amountOfTokens = ethToSend;
@@ -127,18 +127,18 @@ contract("Vault", (accounts) => {
     // Set unlockDate to future time.
     let unlockDate = now + 100000;
     // Create new LockedWallet.
-    let vault = await Vault.new(creator, owner, unlockDate);
+    let vault = await Vault.new("default", creator, owner, unlockDate);
     // Send ether to the wallet.
     await vault.send(ethToSend, { from: creator });
 
     // Get info about the wallet.
     let info = await vault.info();
-
     // Compare result with expected values.
-    assert(info[0] == creator);
-    assert(info[1] == owner);
-    assert(info[2].toNumber() == unlockDate);
-    assert(info[3].toNumber() == now);
-    assert(info[4].toNumber() == ethToSend);
+    assert(info[0] == 'default');
+    assert(info[1] == creator);
+    assert(info[2] == owner);
+    assert(info[3].toNumber() == unlockDate);
+    assert(info[4].toNumber() == now);
+    assert(info[5].toNumber() == 0);
   });
 });
