@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Vault {
     address public creator;
+    string public name;
     address public owner;
     uint256 public unlockDate;
     uint256 public createdAt;
@@ -20,11 +21,13 @@ contract Vault {
     }
 
     constructor(
+        string memory _name,
         address _creator,
         address _owner,
         uint256 _unlockDate
     ) {
         creator = _creator;
+        name = _name;
         owner = _owner;
         unlockDate = _unlockDate;
         createdAt = block.timestamp;
@@ -48,8 +51,8 @@ contract Vault {
        emit WithdrewTokens(_tokenContract, msg.sender, tokenBalance);
     }
 
-    function info() public view returns(address, address, uint256, uint256, uint256) {
-        return (creator, owner, unlockDate, createdAt,  address(this).balance);
+    function info() public view returns(string memory, address, address, uint256, uint256, uint256) {
+        return (name, creator, owner, unlockDate, createdAt,  address(this).balance);
     }
 
     receive() external payable {}

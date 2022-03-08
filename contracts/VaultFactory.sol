@@ -6,6 +6,8 @@ contract VaultFactory {
  
     mapping(address => address[]) wallets;
 
+    address public wallet;
+
     function getWallets(address _user) 
         public
         view
@@ -17,10 +19,11 @@ contract VaultFactory {
     function newVault(address _owner, uint256 _unlockDate)
         payable
         public
-        returns(address wallet)
+        returns(Vault vault)
     {
         // Create new wallet.
-        wallet = address(new Vault(msg.sender, _owner, _unlockDate));
+        vault = new Vault('default', msg.sender, _owner, _unlockDate);
+        wallet = address(vault);
         
         // Add wallet to sender's wallets.
         wallets[msg.sender].push(wallet);
@@ -35,6 +38,8 @@ contract VaultFactory {
 
         // Emit event.
         emit Created(wallet, msg.sender, _owner, block.timestamp, _unlockDate, msg.value);
+
+        return vault;
     }
 
     // Prevents accidental sending of ether to the factory
