@@ -34,15 +34,15 @@ module.exports = async (deployer) => {
     console.error(e);
   }
   let creatorBalance = await coinInstance.balanceOf(creator);
-  console.log("Creator Balance: " + creatorBalance);
+  // console.log("Creator Balance: " + creatorBalance);
 
-  vaultInfo = await vaultAddress.info();
-  console.log(vaultInfo);
-  console.log("Vault Name: " + vaultInfo[0]);
-  console.log("Creator: " + vaultInfo[1]);
-  console.log("Owner: " + vaultInfo[2]);
-  console.log("Date Unlocked: " + vaultInfo[3]);
-  console.log("Date Created: " + vaultInfo[4]);
-  console.log("Balance: " + web3.utils.fromWei(vaultInfo[5], "ether"));
+  // vaultInfo = await vaultAddress.info();
+  // console.log(vaultInfo);
+  // console.log("Vault Name: " + vaultInfo[0]);
+  // console.log("Creator: " + vaultInfo[1]);
+  // console.log("Owner: " + vaultInfo[2]);
+  // console.log("Date Unlocked: " + vaultInfo[3]);
+  // console.log("Date Created: " + vaultInfo[4]);
+  // console.log("Balance: " + web3.utils.fromWei(vaultInfo[5], "ether"));
 
 };
